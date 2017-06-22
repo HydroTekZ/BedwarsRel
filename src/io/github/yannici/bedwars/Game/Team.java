@@ -22,7 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
-@SerializableAs("Team")
+@SerializableAs("Team") @SuppressWarnings("deprecation")
 public class Team implements ConfigurationSerializable {
 
 	private TeamColor color = null;

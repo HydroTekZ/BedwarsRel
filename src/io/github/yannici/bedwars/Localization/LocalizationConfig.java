@@ -89,7 +89,7 @@ public class LocalizationConfig extends YamlConfiguration {
 					try {
 						reader.close();
 						stream.close();
-					} catch (IOException e) {
+					} catch (Exception e) {
 						// already closed
 					}
 				}

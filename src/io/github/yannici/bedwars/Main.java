@@ -23,10 +23,6 @@ import io.github.yannici.bedwars.Shop.Specials.SpecialItem;
 import io.github.yannici.bedwars.Statistics.StorageType;
 import io.github.yannici.bedwars.Statistics.PlayerStatisticManager;
 import io.github.yannici.bedwars.Updater.ConfigUpdater;
-import io.github.yannici.bedwars.Updater.DatabaseUpdater;
-import io.github.yannici.bedwars.Updater.PluginUpdater;
-import io.github.yannici.bedwars.Updater.PluginUpdater.UpdateCallback;
-import io.github.yannici.bedwars.Updater.PluginUpdater.UpdateResult;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,7 +48,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.ScoreboardManager;
 
@@ -126,8 +121,6 @@ public class Main extends JavaPlugin {
 
 		this.loadStatistics();
 		this.localization = this.loadLocalization();
-
-		this.checkUpdates();
 
 		// Loading
 		this.scoreboardManager = Bukkit.getScoreboardManager();
@@ -306,37 +299,6 @@ public class Main extends JavaPlugin {
 		return this.playerStatisticManager;
 	}
 
-	private void checkUpdates() {
-		try {
-			if (this.getBooleanConfig("check-updates", true)) {
-				this.updateChecker = new BukkitRunnable() {
-
-					@Override
-					public void run() {
-						final BukkitRunnable task = this;
-						UpdateCallback callback = new UpdateCallback() {
-
-							@Override
-							public void onFinish(PluginUpdater updater) {
-								if (updater.getResult() == UpdateResult.SUCCESS) {
-									task.cancel();
-								}
-							}
-						};
-
-						new PluginUpdater(Main.getInstance(), Main.PROJECT_ID, Main.getInstance().getFile(),
-								PluginUpdater.UpdateType.DEFAULT, callback,
-								Main.getInstance().getBooleanConfig("update-infos", true));
-					}
-
-				}.runTaskTimerAsynchronously(Main.getInstance(), 40L, 36000L);
-			}
-		} catch (Exception ex) {
-			this.getServer().getConsoleSender()
-					.sendMessage(ChatWriter.pluginMessage(ChatColor.RED + "Check for updates not successful: Error!"));
-		}
-	}
-
 	private LocalizationConfig loadLocalization() {
 		LocalizationConfig config = new LocalizationConfig();
 		config.saveLocales(false);
@@ -372,12 +334,6 @@ public class Main extends JavaPlugin {
 
 		this.dbManager = new DatabaseManager(host, port, user, password, db);
 		this.dbManager.initialize();
-
-		this.getServer().getConsoleSender()
-				.sendMessage(ChatWriter.pluginMessage(ChatColor.GREEN + "Update database ..."));
-		(new DatabaseUpdater()).execute();
-
-		this.getServer().getConsoleSender().sendMessage(ChatWriter.pluginMessage(ChatColor.GREEN + "Done."));
 	}
 
 	public StorageType getStatisticStorageType() {
